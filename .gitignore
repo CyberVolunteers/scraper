@@ -2,3 +2,7 @@
 geckodriver.log
 
 venv
+
+sqlPassword.txt
+
+__pycache__
