@@ -62,14 +62,8 @@ class BHCommunityWorksScraper(DynamicSiteScraper):
             "placeForVolunteering",
             "targetAudience",
             "skills",
-            "createdDate",
             "requirements",
             "opportunityDesc",
-            "opportunityCategory",
-            "opportunityTitle",
-            "numOfvolunteers",
-            "minHoursPerWeek",
-            "maxHoursPerWeek",
             "duration"]
 
         categoryNames = ["", "Skills", "Benefits", "Practical Considerations", "When do I need to be available?", "Where does this role take place?"]
@@ -96,24 +90,32 @@ class BHCommunityWorksScraper(DynamicSiteScraper):
                 out[newDictName] += "\n<b>" + newCategoryName + "</b>\n" + newText
             else:
                 out[newDictName] = newText
+            out[newDictName] = out[newDictName].replace("\n", "<br/>")
 
             # print(newCategoryName, newDictName)
             # print(indices[0] + len(newCategoryName), indices[1])
 
             indices.pop(0)
 
+        out["opportunityTitle"] = self.findElements(".mb-2")[0].text
+        out["numOfvolunteers"] = -1
+        out["minHoursPerWeek"] = -1
+        out["maxHoursPerWeek"] = -1
+        out["charityId"] = 0
 
         if "timeForVolunteering" in out:
             index = out["timeForVolunteering"].find("Morning Afternoon Evening")
             out["timeForVolunteering"] = out["timeForVolunteering"][:index]
 
         # fill in the remaining fields
-        linkToSiteHtml = "<a href=\"%s\">More Details</a>" % link
+        linkToSiteHtml = '<a class="moreDetails" href="%s">More Details</a>' % link
         for requiredField in allFields:
             if requiredField not in out:
                 out[requiredField] = linkToSiteHtml
 
         # pp.pprint(out)
+
+        out["opportunityDesc"] += "\n" + linkToSiteHtml + "\n"
 
         return out
 

@@ -1,4 +1,6 @@
 from selenium import webdriver
+import time
+import sql
 
 baseUrlsListingList = ["https://do-it.org/opportunities/search"]
 isDynamic = [True]
@@ -52,4 +54,13 @@ while True:
     data = scraper.getListingFromListPage(link)
 
     import pprint
+
     pprint.PrettyPrinter(indent=4).pprint(data)
+
+    data["uuid"] = sql.generate_uuid()
+    data["createdDate"] = int(time.time())
+    data["opportunityCategory"] = "Not available"
+    print(time.time())
+
+    listingObject = sql.ListingsTable(**data)
+    sql.recordInDb(listingObject, data)
