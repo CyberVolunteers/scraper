@@ -67,7 +67,7 @@ class BHCommunityWorksScraper(DynamicSiteScraper):
             "duration"]
 
         categoryNames = ["", "Skills", "Benefits", "Practical Considerations", "When do I need to be available?", "Where does this role take place?"]
-        dictNames = ["opportunityDesc", "skills", "opportunityDesc", "opportunityDesc", "timeForVolunteering", "placeForVolunteering"]
+        dictNames = ["opportunityDesc", "skills", "opportunityDesc", ["opportunityDesc", "requirements"], "timeForVolunteering", "placeForVolunteering"]
         indices = [overallText.find(name) for name in categoryNames] + [len(overallText) - len("Register your Interest")]
 
         out = {}
@@ -86,11 +86,19 @@ class BHCommunityWorksScraper(DynamicSiteScraper):
             newDictName = dictNames.pop(0)
             newText = overallText[indices[0] + len(newCategoryName): indices[1]]
 
-            if newDictName in out:
-                out[newDictName] += "\n<b>" + newCategoryName + "</b>\n" + newText
+            newDictNames = []
+
+            if isinstance(newDictName, str):
+                newDictNames = [newDictName]
             else:
-                out[newDictName] = newText
-            out[newDictName] = out[newDictName].replace("\n", "<br/>")
+                newDictNames = newDictName
+
+            for newKey in newDictNames:
+                if newKey in out:
+                    out[newKey] += "\n<b>" + newCategoryName + "</b>\n" + newText
+                else:
+                    out[newKey] = newText
+                out[newKey] = out[newKey].replace("\n", "<br/>")
 
             # print(newCategoryName, newDictName)
             # print(indices[0] + len(newCategoryName), indices[1])
@@ -98,6 +106,7 @@ class BHCommunityWorksScraper(DynamicSiteScraper):
             indices.pop(0)
 
         out["opportunityTitle"] = self.findElements(".mb-2")[0].text
+        out["scrapedCharityName"] = self.findElements(".opportunity-header .container h3.mb-4")[0].text
         out["numOfvolunteers"] = -1
         out["minHoursPerWeek"] = -1
         out["maxHoursPerWeek"] = -1
@@ -105,7 +114,9 @@ class BHCommunityWorksScraper(DynamicSiteScraper):
 
         if "timeForVolunteering" in out:
             index = out["timeForVolunteering"].find("Morning Afternoon Evening")
-            out["timeForVolunteering"] = out["timeForVolunteering"][:index]
+            print([out["timeForVolunteering"]])
+            out["timeForVolunteering"] = out["timeForVolunteering"][len("<br/>Details "):index]
+            print([out["timeForVolunteering"]])
 
         # fill in the remaining fields
         linkToSiteHtml = '<a class="moreDetails" href="%s">More Details</a>' % link

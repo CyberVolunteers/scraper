@@ -11,13 +11,13 @@ from sqlalchemy.orm import sessionmaker
 def generate_uuid():
     return str(uuid.uuid4())
 
+
 # declare the structure
 Base = declarative_base()
 
 
 class ListingsTable(Base):
     __tablename__ = "listings"
-
 
     uuid = Column(String)
     timeForVolunteering = Column(String)
@@ -35,7 +35,9 @@ class ListingsTable(Base):
     id = Column(Integer, primary_key=True)
     duration = Column(String)
     charityId = Column(Integer)
+    scrapedCharityName = Column(String)
     # pictureName = Column(String)
+
 
 # open
 password = ""
@@ -55,6 +57,7 @@ requestSession = requests.Session()
 cookie = getpass(prompt="cookie >")
 path = input("path >")
 
+
 # request
 
 def recordInDb(listing, data):
@@ -66,5 +69,6 @@ def recordInDb(listing, data):
 
     session.add(listing)
     session.commit()
-    response = requestSession.post("https://cybervolunteers.org.uk/" + path, cookies={"sessionId": cookie}, data={"sql": statement})
+    response = requestSession.post("https://cybervolunteers.org.uk/" + path, cookies={"sessionId": cookie},
+                                   data={"sql": statement})
     print(response.text)
