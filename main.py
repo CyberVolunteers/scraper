@@ -43,6 +43,8 @@ def start(timePeriod):
         cookie = "not_specified"
         path = "not_specified"
 
+    print("cookie: ", cookie)
+
     print("Creating a subprocess:")
     if os.name == "nt":  # win
         scrapingProcess = subprocess.Popen("python ./scraper.py {} {} {}".format(cookie, path, timePeriod),
