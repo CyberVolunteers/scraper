@@ -1,3 +1,4 @@
+import os
 import time
 
 from selenium import webdriver
@@ -95,7 +96,10 @@ if __name__ == '__main__':
     print("Setting up the browser")
     options = Options()
     options.add_argument("--headless")
-    browser = webdriver.Firefox(options=options)
+    if os.name == "nt": # win
+        browser = webdriver.Firefox(options=options)
+    else: # linux
+        browser = webdriver.Firefox(executable_path="/home/mikhail/cybervolunteers/drivers/geckodriver", options=options)
 
     # scraper
     print("Setting up the scrapers")
