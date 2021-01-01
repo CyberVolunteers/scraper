@@ -32,7 +32,7 @@ Required format:
 
 """
 
-f = open("scraper.log", "a")
+f = open("./scraper.log", "a")
 
 
 def logPrint(fun):
@@ -95,7 +95,7 @@ if __name__ == '__main__':
     print("Setting up the browser")
     options = Options()
     options.add_argument("--headless")
-    with open("geckodriverPath.txt", "r") as f:
+    with open("./geckodriverPath.txt", "r") as f:
         browser = webdriver.Firefox(firefox_profile=f.read(), options=options)
 
     # scraper

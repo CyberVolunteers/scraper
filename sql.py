@@ -40,7 +40,7 @@ class ListingsTable(Base):
 
 
 # open
-with open("sqlPassword.txt", "r") as f:
+with open("./sqlPassword.txt", "r") as f:
     password = f.read()
 
 connectionString = "mysql+pymysql://serverQueryManager:%s@localhost:3306/cybervolunteers" % password
