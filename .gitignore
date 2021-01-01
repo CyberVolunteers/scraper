@@ -6,3 +6,6 @@ venv
 sqlPassword.txt
 
 __pycache__
+
+scraper.log
+scraper.pid
