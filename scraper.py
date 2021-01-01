@@ -95,7 +95,8 @@ if __name__ == '__main__':
     print("Setting up the browser")
     options = Options()
     options.add_argument("--headless")
-    browser = webdriver.Firefox(firefox_profile=r"C:\Program Files\geckodriver", options=options)
+    with open("geckodriverPath.txt", "r") as f:
+        browser = webdriver.Firefox(firefox_profile=f.read(), options=options)
 
     # scraper
     print("Setting up the scrapers")

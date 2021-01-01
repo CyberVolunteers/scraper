@@ -9,3 +9,5 @@ __pycache__
 
 scraper.log
 scraper.pid
+
+geckodriverPath.txt
