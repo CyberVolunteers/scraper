@@ -1,5 +1,4 @@
 import uuid
-from getpass import getpass
 
 import requests
 import sqlalchemy as db
@@ -40,12 +39,10 @@ class ListingsTable(Base):
 
 
 # open
-password = ""
 with open("sqlPassword.txt", "r") as f:
     password = f.read()
 
 connectionString = "mysql+pymysql://serverQueryManager:%s@localhost:3306/cybervolunteers" % password
-print(connectionString)
 
 engine = db.create_engine(connectionString)
 Session = sessionmaker(bind=engine)
@@ -53,14 +50,11 @@ session = Session()
 
 requestSession = requests.Session()
 
-# log in
-cookie = getpass(prompt="cookie >")
-path = input("path >")
-
-
 # request
 
-def recordInDb(listing, data):
+def recordInDb(listing, data, credentials):
+    cookie, path = credentials
+
     statement = (
         insert(ListingsTable).
         values(**data)
@@ -73,7 +67,10 @@ def recordInDb(listing, data):
                                    data={"sql": statement})
     print(response.text)
 
-def deleteFromSite(url):
+
+def deleteFromSite(url, credentials):
+    cookie, path = credentials
+
     statement = (
         delete(ListingsTable).
         where(ListingsTable.duration.like('<a class="moreDetails" href="{}%'.format(url)))

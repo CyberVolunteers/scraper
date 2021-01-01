@@ -1,87 +1,80 @@
-import time
+#!/usr/bin/env python
+import subprocess
 
-from selenium import webdriver
-from selenium.webdriver.firefox.options import Options
+from sys import argv
 
-import sql
+from getpass import getpass
 
-baseUrlsListingList = ["https://do-it.org/opportunities/search"]
-isDynamic = [True]
-baseUrlsIndividualListings = [""]
+import psutil as psutil
 
-# page = requests.get(baseUrlsListingList[0])
-#
-# print(page.content)
-#
-# parsedHTML = BeautifulSoup(page.content, 'html.parser')
-#
-# print(parsedHTML)
+def getStoredPid():
+    with open("./scraper.pid", "r") as f:
+        pid = int(f.read())
+        f.close()
+        return pid
 
-"""
-Required format:
+def stop():
+    pid = getStoredPid()
+    print("Retrieved pid:", pid)
 
-{
-    timeForVolunteering:
-    placeForVolunteering:
-    targetAudience:
-    skills:
-    createdDate:
-    requirements:
-    opportunityDesc:
-    opportunityCategory:
-    opportunityTitle:
-    numOfvolunteers:
-    minHoursPerWeek:
-    maxHoursPerWeek:
-    duration:
-    charityId:    
-}
-
-"""
-
-options = Options()
-options.add_argument("--headless")
-
-browser = webdriver.Firefox(firefox_profile=r"C:\Program Files\geckodriver", options=options)
-
-from siteScraperFunctions.bhCommunityWorks import BHCommunityWorksScraper
-
-scraper = BHCommunityWorksScraper(browser)
-
-nextListingLinkGen = scraper.nextListingLink()
+    for process in psutil.process_iter():
+        if process.pid == pid:
+            process.terminate()
+            print("Terminated")
+            return
+    print("Could not find the process to terminate")
 
 
-def scrape():
-    # add the new ones
-    while True:
-        try:
-            link = next(nextListingLinkGen)
-        except RuntimeError:
-            print("End")
-            break
-        data = scraper.getListingFromListPage(link)
+def start(timePeriod):
 
-        import pprint
+    lastPid = getStoredPid()
+    for process in psutil.process_iter():
+        if process.pid == lastPid:
+            raise Exception("Last instance is still running")
 
-        pprint.PrettyPrinter(indent=4).pprint(data)
+    # log in
+    cookie = getpass(prompt="cookie >")
+    path = input("path >")
 
-        data["uuid"] = sql.generate_uuid()
-        data["createdDate"] = int(time.time())
-        data["opportunityCategory"] = "Not available"
-        print(time.time())
+    if cookie == "":
+        cookie = "not_specified"
+        path = "not_specified"
 
-        listingObject = sql.ListingsTable(**data)
-        sql.recordInDb(listingObject, data)
+    print("Creating a subprocess:")
+    scrapingProcess = subprocess.Popen("python ./scraper.py {} {} {}".format(cookie, path, timePeriod),
+                                       creationflags=subprocess.CREATE_NEW_PROCESS_GROUP)
+    print("Process pid:", scrapingProcess.pid)
 
-    browser.quit()
-
-
-def update():
-    # delete the old ones
-    sql.deleteFromSite("https://volunteer.bhcommunityworks.org.uk/")
-
-    # add the new ones
-    scrape()
+    # record the process
+    with open("./scraper.pid", "w") as f:
+        f.seek(0)
+        f.write(str(scrapingProcess.pid))
+        f.close()
 
 
-update()
+def restart(timePeriod):
+    stop()
+    start(timePeriod)
+
+
+if __name__ == '__main__':
+
+    if len(argv) < 2:
+        raise Exception("Expected at least 2 arguments, got %i" % len(argv), argv)
+
+    command = argv[1]
+
+    if len(argv) == 2:
+        timePeriod = 7 * 24
+    else:
+        timePeriod = argv[2]
+
+
+    if command == "stop":
+        stop()
+    elif command == "start":
+        start(timePeriod)
+    elif command == "restart":
+        restart(timePeriod)
+    else:
+        raise Exception("Command not found")
