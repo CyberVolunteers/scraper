@@ -71,7 +71,7 @@ if __name__ == '__main__':
     command = argv[1]
 
     if len(argv) == 2:
-        timePeriod = 7 * 24
+        timePeriod = 7 * 24 * 60 * 60
     else:
         timePeriod = argv[2]
 
