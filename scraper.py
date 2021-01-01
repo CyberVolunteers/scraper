@@ -87,6 +87,7 @@ if __name__ == '__main__':
         print("Wrong number of arguments, expected 4")
         raise Exception("Wrong number of arguments, expected 4, received these arguments: ", argv)
 
+    # credentials
     print("Retrieving credentials")
     credentials = (argv[1], argv[2])
     period = int(argv[3])
@@ -105,15 +106,18 @@ if __name__ == '__main__':
         browser = webdriver.Firefox(capabilities=cap, executable_path="/home/mikhail/cybervolunteers/drivers/geckodriver",
                                     options=options)
 
-    # scraper
-    print("Setting up the scrapers")
-    scraper = BHCommunityWorksScraper(browser)
-    nextListingLinkGen = scraper.nextListingLink()
-
     try:
         while True:
+            # reset the scraper
+            # scraper
+
+            print("Setting up the scrapers")
+            scraper = BHCommunityWorksScraper(browser)
+            nextListingLinkGen = scraper.nextListingLink()
             update(credentials, scraper, nextListingLinkGen)
             time.sleep(period)
+
+
     except Exception as e:
         print("Exception")
         print(e)
