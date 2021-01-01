@@ -9,11 +9,13 @@ import psutil as psutil
 
 import os
 
+
 def getStoredPid():
     with open("./scraper.pid", "r") as f:
         pid = int(f.read())
         f.close()
         return pid
+
 
 def stop():
     pid = getStoredPid()
@@ -28,7 +30,6 @@ def stop():
 
 
 def start(timePeriod):
-
     lastPid = getStoredPid()
     for process in psutil.process_iter():
         if process.pid == lastPid:
@@ -43,13 +44,12 @@ def start(timePeriod):
         path = "not_specified"
 
     print("Creating a subprocess:")
-    if os.name == "nt": # win
+    if os.name == "nt":  # win
         scrapingProcess = subprocess.Popen("python ./scraper.py {} {} {}".format(cookie, path, timePeriod),
-                                       creationflags=subprocess.CREATE_NEW_PROCESS_GROUP)
-    else: # linux
+                                           creationflags=subprocess.CREATE_NEW_PROCESS_GROUP)
+    else:  # linux
         scrapingProcess = subprocess.Popen("python ./scraper.py {} {} {}".format("cookie", "path", 10), shell=True)
     print("Process pid:", scrapingProcess.pid)
-
 
     # record the process
     with open("./scraper.pid", "w") as f:

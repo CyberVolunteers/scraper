@@ -4,6 +4,7 @@ import time
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 from siteScraperFunctions.bhCommunityWorks import BHCommunityWorksScraper
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 import sql
 
@@ -96,10 +97,13 @@ if __name__ == '__main__':
     print("Setting up the browser")
     options = Options()
     options.add_argument("--headless")
-    if os.name == "nt": # win
+    if os.name == "nt":  # win
         browser = webdriver.Firefox(options=options)
-    else: # linux
-        browser = webdriver.Firefox(executable_path="/home/mikhail/cybervolunteers/drivers/geckodriver", options=options)
+    else:  # linux
+        cap = DesiredCapabilities().FIREFOX
+        cap["marionette"] = False
+        browser = webdriver.Firefox(capabilities=cap, executable_path="/home/mikhail/cybervolunteers/drivers/geckodriver",
+                                    options=options)
 
     # scraper
     print("Setting up the scrapers")
