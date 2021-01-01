@@ -1,5 +1,8 @@
-from selenium import webdriver
 import time
+
+from selenium import webdriver
+from selenium.webdriver.firefox.options import Options
+
 import sql
 
 baseUrlsListingList = ["https://do-it.org/opportunities/search"]
@@ -36,31 +39,49 @@ Required format:
 
 """
 
-browser = webdriver.Firefox(r"C:\Program Files\geckodriver")
+options = Options()
+options.add_argument("--headless")
 
-from siteScraperFunctions.doItOrg import DoItOrgScraper
+browser = webdriver.Firefox(firefox_profile=r"C:\Program Files\geckodriver", options=options)
+
 from siteScraperFunctions.bhCommunityWorks import BHCommunityWorksScraper
 
 scraper = BHCommunityWorksScraper(browser)
 
 nextListingLinkGen = scraper.nextListingLink()
 
-while True:
-    try:
-        link = next(nextListingLinkGen)
-    except RuntimeError:
-        print("End")
-        break
-    data = scraper.getListingFromListPage(link)
 
-    import pprint
+def scrape():
+    # add the new ones
+    while True:
+        try:
+            link = next(nextListingLinkGen)
+        except RuntimeError:
+            print("End")
+            break
+        data = scraper.getListingFromListPage(link)
 
-    pprint.PrettyPrinter(indent=4).pprint(data)
+        import pprint
 
-    data["uuid"] = sql.generate_uuid()
-    data["createdDate"] = int(time.time())
-    data["opportunityCategory"] = "Not available"
-    print(time.time())
+        pprint.PrettyPrinter(indent=4).pprint(data)
 
-    listingObject = sql.ListingsTable(**data)
-    sql.recordInDb(listingObject, data)
+        data["uuid"] = sql.generate_uuid()
+        data["createdDate"] = int(time.time())
+        data["opportunityCategory"] = "Not available"
+        print(time.time())
+
+        listingObject = sql.ListingsTable(**data)
+        sql.recordInDb(listingObject, data)
+
+    browser.quit()
+
+
+def update():
+    # delete the old ones
+    sql.deleteFromSite("https://volunteer.bhcommunityworks.org.uk/")
+
+    # add the new ones
+    scrape()
+
+
+update()

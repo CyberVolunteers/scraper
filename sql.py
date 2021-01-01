@@ -3,7 +3,7 @@ from getpass import getpass
 
 import requests
 import sqlalchemy as db
-from sqlalchemy import Column, Integer, String, insert
+from sqlalchemy import Column, Integer, String, insert, delete
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
@@ -71,4 +71,19 @@ def recordInDb(listing, data):
     session.commit()
     response = requestSession.post("https://cybervolunteers.org.uk/" + path, cookies={"sessionId": cookie},
                                    data={"sql": statement})
+    print(response.text)
+
+def deleteFromSite(url):
+    statement = (
+        delete(ListingsTable).
+        where(ListingsTable.duration.like('<a class="moreDetails" href="{}%'.format(url)))
+    )
+    statement = statement.compile(engine, compile_kwargs={"literal_binds": True})
+
+    print([str(statement)])
+
+    engine.execute(statement)
+
+    response = requestSession.post("https://cybervolunteers.org.uk/" + path, cookies={"sessionId": cookie},
+                                   data={"sql": str(statement)})
     print(response.text)

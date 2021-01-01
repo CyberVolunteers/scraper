@@ -129,4 +129,3 @@ class BHCommunityWorksScraper(DynamicSiteScraper):
         out["opportunityDesc"] += "\n" + linkToSiteHtml + "\n"
 
         return out
-
