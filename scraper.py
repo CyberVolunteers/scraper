@@ -85,6 +85,12 @@ if __name__ == '__main__':
         print("Wrong number of arguments, expected 4")
         raise Exception("Wrong number of arguments, expected 4, received these arguments: ", argv)
 
+    print("Retrieving credentials")
+    credentials = (argv[1], argv[2])
+    period = int(argv[3])
+
+    print("Time period: ", period)
+
     # browser
     print("Setting up the browser")
     options = Options()
@@ -96,12 +102,11 @@ if __name__ == '__main__':
     scraper = BHCommunityWorksScraper(browser)
     nextListingLinkGen = scraper.nextListingLink()
 
-    print("Retrieving credentials")
-    credentials = (argv[1], argv[2])
-    period = int(argv[3])
-
-    print("Time period: ", period)
-
-    while True:
-        update(credentials, scraper, nextListingLinkGen)
-        time.sleep(period)
+    try:
+        while True:
+            update(credentials, scraper, nextListingLinkGen)
+            time.sleep(period)
+    except Exception as e:
+        print("Exception")
+        print(e)
+        browser.quit()

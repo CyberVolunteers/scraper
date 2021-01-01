@@ -14,6 +14,7 @@ def generate_uuid():
 # declare the structure
 Base = declarative_base()
 
+connectLocally = True
 
 class ListingsTable(Base):
     __tablename__ = "listings"
@@ -61,8 +62,12 @@ def recordInDb(listing, data, credentials):
     )
     statement = statement.compile(engine, compile_kwargs={"literal_binds": True})
 
-    session.add(listing)
-    session.commit()
+    try:
+        session.add(listing)
+        session.commit()
+    except:
+        print("Not able to commit to local db")
+
     response = requestSession.post("https://cybervolunteers.org.uk/" + path, cookies={"sessionId": cookie},
                                    data={"sql": statement})
     print(response.text)
@@ -79,7 +84,10 @@ def deleteFromSite(url, credentials):
 
     print([str(statement)])
 
-    engine.execute(statement)
+    try:
+        engine.execute(statement)
+    except:
+        print("Not able to commit to local db")
 
     response = requestSession.post("https://cybervolunteers.org.uk/" + path, cookies={"sessionId": cookie},
                                    data={"sql": str(statement)})
