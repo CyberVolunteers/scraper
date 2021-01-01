@@ -7,6 +7,8 @@ from getpass import getpass
 
 import psutil as psutil
 
+import os
+
 def getStoredPid():
     with open("./scraper.pid", "r") as f:
         pid = int(f.read())
@@ -41,9 +43,13 @@ def start(timePeriod):
         path = "not_specified"
 
     print("Creating a subprocess:")
-    scrapingProcess = subprocess.Popen("python ./scraper.py {} {} {}".format(cookie, path, timePeriod),
+    if os.name == "nt": # win
+        scrapingProcess = subprocess.Popen("python ./scraper.py {} {} {}".format(cookie, path, timePeriod),
                                        creationflags=subprocess.CREATE_NEW_PROCESS_GROUP)
+    else: # linux
+        subprocess.Popen("python ./scraper.py {} {} {}".format("cookie", "path", 10), shell=True)
     print("Process pid:", scrapingProcess.pid)
+
 
     # record the process
     with open("./scraper.pid", "w") as f:
@@ -68,7 +74,6 @@ if __name__ == '__main__':
         timePeriod = 7 * 24
     else:
         timePeriod = argv[2]
-
 
     if command == "stop":
         stop()
