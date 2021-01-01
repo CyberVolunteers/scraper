@@ -47,7 +47,7 @@ def start(timePeriod):
         scrapingProcess = subprocess.Popen("python ./scraper.py {} {} {}".format(cookie, path, timePeriod),
                                        creationflags=subprocess.CREATE_NEW_PROCESS_GROUP)
     else: # linux
-        subprocess.Popen("python ./scraper.py {} {} {}".format("cookie", "path", 10), shell=True)
+        scrapingProcess = subprocess.Popen("python ./scraper.py {} {} {}".format("cookie", "path", 10), shell=True)
     print("Process pid:", scrapingProcess.pid)
 
 
