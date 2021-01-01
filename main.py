@@ -37,13 +37,15 @@ def start(timePeriod):
 
     # log in
     cookie = getpass(prompt="cookie >")
+
+    print("cookie: ", cookie)
+
     path = input("path >")
 
     if cookie == "":
         cookie = "not_specified"
         path = "not_specified"
 
-    print("cookie: ", cookie)
 
     print("Creating a subprocess:")
     if os.name == "nt":  # win
