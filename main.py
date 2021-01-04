@@ -38,7 +38,7 @@ def start():
     # log in
     cookie = getpass(prompt="cookie >")
 
-    print("cookie: ", cookie)
+    print("cookie: ", "'" + cookie + "'")
 
     path = input("path >")
 
