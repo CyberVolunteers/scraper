@@ -39,7 +39,8 @@ logFile = open("./scraper.log", "a")
 
 def logPrint(fun):
     def onPrint(*args, **kwargs):
-        fun(*args, **kwargs)
+        if doPrint:
+            fun(*args, **kwargs)
         logFile.write(repr(args) + " " + repr(kwargs) + "\n")
 
     return onPrint
@@ -60,9 +61,9 @@ def scrape(credentials, scraper, nextListingLinkGen):
             break
         data = scraper.getListingFromListPage(link)
 
-        import pprint
+        # import pprint
 
-        pprint.PrettyPrinter(indent=4).pprint(data)
+        # pprint.PrettyPrinter(indent=4).pprint(data)
 
         data["uuid"] = sql.generate_uuid()
         data["createdDate"] = int(time.time())
@@ -82,13 +83,17 @@ def update(credentials, scraper, nextListingLinkGen):
 
 
 if __name__ == '__main__':
-    print("---Start Log---")
-    if len(argv) != 4:
-        print("Wrong number of arguments, expected 4")
+    if len(argv) != 5:
+        print("Wrong number of arguments, expected 5")
         raise Exception("Wrong number of arguments, expected 4, received these arguments: ", argv)
 
     # credentials
+    doPrint = argv[4] == "True"
+
+    print("---Start Log---")
+    print("Arguments: ", argv)
     print("Retrieving credentials")
+
     credentials = (argv[1], argv[2])
     period = int(argv[3])
 
@@ -103,7 +108,8 @@ if __name__ == '__main__':
     else:  # linux
         cap = DesiredCapabilities().FIREFOX
         cap["marionette"] = False
-        browser = webdriver.Firefox(capabilities=cap, executable_path="/home/mikhail/cybervolunteers/drivers/geckodriver",
+        browser = webdriver.Firefox(capabilities=cap,
+                                    executable_path="/home/mikhail/cybervolunteers/drivers/geckodriver",
                                     options=options)
 
     try:

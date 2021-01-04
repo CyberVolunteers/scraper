@@ -70,7 +70,6 @@ def recordInDb(listing, data, credentials):
 
     response = requestSession.post("https://cybervolunteers.org.uk/" + path, cookies={"sessionId": cookie},
                                    data={"sql": statement})
-    print(response.text)
 
 
 def deleteFromSite(url, credentials):
@@ -82,8 +81,6 @@ def deleteFromSite(url, credentials):
     )
     statement = statement.compile(engine, compile_kwargs={"literal_binds": True})
 
-    print([str(statement)])
-
     try:
         engine.execute(statement)
     except:
@@ -91,4 +88,3 @@ def deleteFromSite(url, credentials):
 
     response = requestSession.post("https://cybervolunteers.org.uk/" + path, cookies={"sessionId": cookie},
                                    data={"sql": str(statement)})
-    print(response.text)

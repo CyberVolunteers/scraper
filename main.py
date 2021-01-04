@@ -29,7 +29,7 @@ def stop():
     print("Could not find the process to terminate")
 
 
-def start(timePeriod):
+def start():
     lastPid = getStoredPid()
     for process in psutil.process_iter():
         if process.pid == lastPid:
@@ -46,13 +46,13 @@ def start(timePeriod):
         cookie = "not_specified"
         path = "not_specified"
 
-
     print("Creating a subprocess:")
     if os.name == "nt":  # win
-        scrapingProcess = subprocess.Popen("python ./scraper.py {} {} {}".format(cookie, path, timePeriod),
+        scrapingProcess = subprocess.Popen("python ./scraper.py {} {} {} {}".format(cookie, path, timePeriod, doPrint),
                                            creationflags=subprocess.CREATE_NEW_PROCESS_GROUP)
     else:  # linux
-        scrapingProcess = subprocess.Popen("python ./scraper.py {} {} {}".format("cookie", "path", timePeriod), shell=True)
+        scrapingProcess = subprocess.Popen("python3 ./scraper.py {} {} {} {}".format(cookie, path, timePeriod, doPrint),
+                                           shell=True)
     print("Process pid:", scrapingProcess.pid)
 
     # record the process
@@ -62,9 +62,9 @@ def start(timePeriod):
         f.close()
 
 
-def restart(timePeriod):
+def restart():
     stop()
-    start(timePeriod)
+    start()
 
 
 if __name__ == '__main__':
@@ -74,16 +74,23 @@ if __name__ == '__main__':
 
     command = argv[1]
 
-    if len(argv) == 2:
-        timePeriod = 7 * 24 * 60 * 60
+    print(argv)
+
+    if len(argv) >= 3:
+        doPrint = argv[2][0].lower() != "f"
     else:
-        timePeriod = argv[2]
+        doPrint = True
+
+    if len(argv) >= 4:
+        timePeriod = argv[3]
+    else:
+        timePeriod = 7 * 24 * 60 * 60
 
     if command == "stop":
         stop()
     elif command == "start":
-        start(timePeriod)
+        start()
     elif command == "restart":
-        restart(timePeriod)
+        restart()
     else:
         raise Exception("Command not found")

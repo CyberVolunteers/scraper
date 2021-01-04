@@ -1,7 +1,5 @@
 from dynamicSiteScraper import DynamicSiteScraper
-import pprint
 
-pp = pprint.PrettyPrinter(indent=4)
 
 class BHCommunityWorksScraper(DynamicSiteScraper):
 
@@ -29,8 +27,6 @@ class BHCommunityWorksScraper(DynamicSiteScraper):
         self.newLinksAvaliable = False
 
     def getListingFromListPage(self, link):
-        # print(link)
-        print(len(self.currentListingListData))
         self.browser.get(link)
 
         """
@@ -59,21 +55,21 @@ class BHCommunityWorksScraper(DynamicSiteScraper):
         overallText = mainBody.text
 
         allFields = ["timeForVolunteering",
-            "placeForVolunteering",
-            "targetAudience",
-            "skills",
-            "requirements",
-            "opportunityDesc",
-            "duration"]
+                     "placeForVolunteering",
+                     "targetAudience",
+                     "skills",
+                     "requirements",
+                     "opportunityDesc",
+                     "duration"]
 
-        categoryNames = ["", "Skills", "Benefits", "Practical Considerations", "When do I need to be available?", "Where does this role take place?"]
-        dictNames = ["opportunityDesc", "skills", "opportunityDesc", ["opportunityDesc", "requirements"], "timeForVolunteering", "placeForVolunteering"]
-        indices = [overallText.find(name) for name in categoryNames] + [len(overallText) - len("Register your Interest")]
+        categoryNames = ["", "Skills", "Benefits", "Practical Considerations", "When do I need to be available?",
+                         "Where does this role take place?"]
+        dictNames = ["opportunityDesc", "skills", "opportunityDesc", ["opportunityDesc", "requirements"],
+                     "timeForVolunteering", "placeForVolunteering"]
+        indices = [overallText.find(name) for name in categoryNames] + [
+            len(overallText) - len("Register your Interest")]
 
         out = {}
-
-        # print(categoryNames)
-        # print(indices)
 
         while len(categoryNames) != 0:
             # if it is skipped, pop
@@ -85,8 +81,6 @@ class BHCommunityWorksScraper(DynamicSiteScraper):
             newCategoryName = categoryNames.pop(0)
             newDictName = dictNames.pop(0)
             newText = overallText[indices[0] + len(newCategoryName): indices[1]]
-
-            newDictNames = []
 
             if isinstance(newDictName, str):
                 newDictNames = [newDictName]
@@ -100,9 +94,6 @@ class BHCommunityWorksScraper(DynamicSiteScraper):
                     out[newKey] = newText
                 out[newKey] = out[newKey].replace("\n", "<br/>")
 
-            # print(newCategoryName, newDictName)
-            # print(indices[0] + len(newCategoryName), indices[1])
-
             indices.pop(0)
 
         out["opportunityTitle"] = self.findElements(".mb-2")[0].text
@@ -114,17 +105,13 @@ class BHCommunityWorksScraper(DynamicSiteScraper):
 
         if "timeForVolunteering" in out:
             index = out["timeForVolunteering"].find("Morning Afternoon Evening")
-            print([out["timeForVolunteering"]])
             out["timeForVolunteering"] = out["timeForVolunteering"][len("<br/>Details "):index]
-            print([out["timeForVolunteering"]])
 
         # fill in the remaining fields
         linkToSiteHtml = '<a class="moreDetails" href="%s">More Details</a>' % link
         for requiredField in allFields:
             if requiredField not in out:
                 out[requiredField] = linkToSiteHtml
-
-        # pp.pprint(out)
 
         out["opportunityDesc"] += "\n" + linkToSiteHtml + "\n"
 
