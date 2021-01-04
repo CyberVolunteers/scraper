@@ -107,7 +107,6 @@ if __name__ == '__main__':
         browser = webdriver.Firefox(options=options)
     else:  # linux
         cap = DesiredCapabilities().FIREFOX
-        cap["marionette"] = False
         browser = webdriver.Firefox(capabilities=cap,
                                     executable_path="/home/mikhail/cybervolunteers/drivers/geckodriver",
                                     options=options)

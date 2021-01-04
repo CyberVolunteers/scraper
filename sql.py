@@ -66,7 +66,8 @@ def recordInDb(listing, data, credentials):
         session.add(listing)
         session.commit()
     except:
-        print("Not able to commit to local db")
+        pass
+        # print("Not able to commit to local db")
 
     response = requestSession.post("https://cybervolunteers.org.uk/" + path, cookies={"sessionId": cookie},
                                    data={"sql": statement})
@@ -84,7 +85,8 @@ def deleteFromSite(url, credentials):
     try:
         engine.execute(statement)
     except:
-        print("Not able to commit to local db")
+        pass
+        # print("Not able to commit to local db")
 
     response = requestSession.post("https://cybervolunteers.org.uk/" + path, cookies={"sessionId": cookie},
                                    data={"sql": str(statement)})
